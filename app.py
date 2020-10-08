@@ -1,14 +1,17 @@
 import numpy as np
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify
+#import model
 import pickle
 
 app = Flask(__name__)
 #model = pickle.load(open('model.pkl', 'rb'))
 
 
-@app.route('/')
+@app.route('/batTeams')
 def home():
-    return render_template('index2.html')
+    response = jsonify({"sdsd": "Sdd"})
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response
 
 
 @app.route('/predict', methods=['POST'])
