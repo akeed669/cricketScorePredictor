@@ -9,12 +9,12 @@ from sklearn.ensemble import RandomForestRegressor, ExtraTreesRegressor
 from sklearn.preprocessing import StandardScaler, MinMaxScaler, OneHotEncoder
 from sklearn.compose import make_column_transformer
 from datetime import datetime
-from joblib import dump, load
+
 
 # retrieve the dataset from the csv file
 allColumns = pd.read_csv('odiBalls.csv')
 
-myColumns = allColumns.iloc[:50000]
+myColumns = allColumns.iloc[:100000]
 
 # drop any unneccesary columns
 myColumns = myColumns.drop(
@@ -61,7 +61,11 @@ encoder = OneHotEncoder(
 
 encoded = encoder.fit_transform(chi).toarray()
 
-dump(encoder, 'savedEncoderModel')
+# storing/pickling the encoder into a file
+filename3 = 'encoder'
+outfile3 = open(filename3, 'wb')
+pickle.dump(encoder, outfile3)
+outfile3.close()
 
 feature_names = encoder.get_feature_names(['venue', 'bat_team', 'bowl_team'])
 
