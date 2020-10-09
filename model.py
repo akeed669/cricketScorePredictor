@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
+import pickle
+#import matplotlib.pyplot as plt
 from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import cross_val_score, KFold, GridSearchCV
 from sklearn.model_selection import train_test_split
@@ -13,8 +14,10 @@ from joblib import dump, load
 # retrieve the dataset from the csv file
 allColumns = pd.read_csv('odiBalls.csv')
 
+myColumns = allColumns.iloc[:50000]
+
 # drop any unneccesary columns
-myColumns = allColumns.drop(
+myColumns = myColumns.drop(
     ['mid', 'runs_last_5', 'wickets_last_5', 'batsman', 'bowler'], axis=1)
 
 # convert the date input to a pandas datetime object
@@ -35,8 +38,22 @@ forEncoding = allFeatures.select_dtypes('object')
 chi = forEncoding.values
 
 venues = np.unique(chi[:, 0])
+exportVenues = venues.tolist()
+
 bat_team = np.unique(chi[:, 1])
+exportBatTeams = bat_team.tolist()
+
 bowl_team = np.unique(chi[:, 2])
+exportBowlTeams = bowl_team.tolist()
+
+listsArray = [exportVenues, exportBatTeams, exportBowlTeams]
+
+# storing/pickling the items for the lists into a file
+filename1 = 'listsFile'
+outfile1 = open(filename1, 'wb')
+pickle.dump(listsArray, outfile1)
+outfile1.close()
+
 
 # encode all the categorical columns
 encoder = OneHotEncoder(
@@ -56,33 +73,9 @@ train_features, test_features, train_labels, test_labels = train_test_split(
 
 rf = RandomForestRegressor(n_estimators=100, random_state=42)
 rf.fit(train_features, train_labels)
-dump(rf, 'randomForest')
-# Use the forest's predict method on the new data
 
-inp = np.array(['10/23/2018', 72, 0, 33, 35, 60,
-                'R Premadasa Stadium', 'Sri Lanka', 'England'])
-
-inp[0] = datetime.strptime(inp[0], "%m/%d/%Y").toordinal()
-
-venues2 = np.unique(inp[6])
-batTeam2 = np.unique(inp[7])
-bowlTeam2 = np.unique(inp[8])
-
-numericals = pd.DataFrame({'date': inp[0], 'runs': inp[1], 'wickets': inp[2],
-                           'striker': inp[3], 'non-striker': inp[4], 'balls': inp[5]}, index=[0])
-
-importedEncodermodel = load('savedEncoderModel')
-
-encoded2 = importedEncodermodel.fit_transform(inp[6:].reshape(1, -1)).toarray()
-
-feature_names2 = importedEncodermodel.get_feature_names(
-    ['venue', 'bat_team', 'bowl_team', ])
-
-features2 = pd.concat([numericals, pd.DataFrame(
-    encoded2, columns=feature_names2).astype(int)], axis=1)
-
-importedRF = load('randomForest')
-
-z = importedRF.predict(features2)
-
-print("Prediction score:", z)
+# storing/pickling the fitted model into a file
+filename2 = 'forestModel'
+outfile2 = open(filename2, 'wb')
+pickle.dump(rf, outfile2)
+outfile2.close()
