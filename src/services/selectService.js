@@ -1,6 +1,10 @@
 import http from "./httpService";
 import { apiUrl } from "../config.json";
 
-export function getBattingTeams() {
-  return http.get(apiUrl + "/batTeams");
+export function getSelectValues() {
+  return http.get(apiUrl + "/listdata");
+}
+
+export function predictScore(match) {
+  return http.post(apiUrl + "/predict", match);
 }
