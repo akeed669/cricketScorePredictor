@@ -27,7 +27,7 @@ def predict():
     req_data = request.get_json()
     mydict = list(req_data.values())
     calculatedScore = predictScore(mydict)
-    return jsonify(calculatedScore[0])
+    return jsonify(round(calculatedScore[0]))
 
 
 # @app.route('/results', methods=['POST'])
