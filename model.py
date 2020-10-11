@@ -12,13 +12,13 @@ from datetime import datetime
 
 
 # retrieve the dataset from the csv file
-allColumns = pd.read_csv('odiBalls.csv')
+allColumns = pd.read_csv('odiBallsReducedAdded.csv')
 
-myColumns = allColumns.iloc[:100000]
+#myColumns = allColumns.iloc[:100000]
 
 # drop any unneccesary columns
-myColumns = myColumns.drop(
-    ['mid', 'runs_last_5', 'wickets_last_5', 'batsman', 'bowler'], axis=1)
+myColumns = allColumns.drop(
+    ['mid'], axis=1)
 
 # convert the date input to a pandas datetime object
 myColumns['date'] = pd.to_datetime(myColumns['date'])

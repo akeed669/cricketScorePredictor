@@ -21,13 +21,19 @@ infile3.close()
 def predictScore(matchValues):
 
     inp = np.array(matchValues)
-
-    inp[3] = datetime.strptime(inp[3], "%Y-%m-%d").toordinal()
-
-    numericals = pd.DataFrame({'matchDate': inp[3], 'runs': inp[4], 'wickets': inp[5],
-                               'balls': inp[6], 'strikerRuns': inp[7], 'nonStrikerRuns': inp[8], }, index=[0])
-
     print(inp)
+    n = inp[3:]
+
+    n[0] = datetime.strptime(n[0], "%Y-%m-%d").toordinal()
+
+    ni = n.astype(np.integer)
+    print(ni)
+    # ni[6] = 300-ni[3]
+    # ni[7] = 10-ni[2]
+
+    numericals = pd.DataFrame({'matchDate': ni[0], 'runs': ni[1], 'wickets': ni[2],
+                               'strikerRuns': ni[3], 'nonStrikerRuns': ni[4], 'balls': ni[5], 'ballsRem': 300-ni[5], 'wktsRem': 10-ni[2]}, index=[0])
+    print(numericals)
     encoded = myEncoder.fit_transform(inp[0:3].reshape(1, -1)).toarray()
 
     feature_names = myEncoder.get_feature_names(
