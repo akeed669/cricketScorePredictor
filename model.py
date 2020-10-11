@@ -14,11 +14,11 @@ from datetime import datetime
 # retrieve the dataset from the csv file
 allColumns = pd.read_csv('odiBallsReducedAdded.csv')
 
-#myColumns = allColumns.iloc[:100000]
+myColumns = allColumns.iloc[:50000]
 
 # drop any unneccesary columns
 myColumns = allColumns.drop(
-    ['mid'], axis=1)
+    ['mid', 'ballsRem', 'wktsRem'], axis=1)
 
 # convert the date input to a pandas datetime object
 myColumns['date'] = pd.to_datetime(myColumns['date'])
@@ -26,12 +26,13 @@ myColumns['date'] = pd.to_datetime(myColumns['date'])
 # convert all the dates in the date column to type ordinal
 myColumns['date'] = myColumns['date'].apply(datetime.toordinal)
 
+
 # specify what the model will predict
 labels = np.array(myColumns['total'])
 
 # specify the features that the model will use as inputs
 allFeatures = myColumns.drop('total', axis=1)
-
+# print(allFeatures.tail())
 # select all columns where the data type = object
 forEncoding = allFeatures.select_dtypes('object')
 
@@ -71,6 +72,7 @@ feature_names = encoder.get_feature_names(['venue', 'bat_team', 'bowl_team'])
 
 features = pd.concat([allFeatures.select_dtypes(exclude='object'), pd.DataFrame(
     encoded, columns=feature_names).astype(int)], axis=1)
+
 
 train_features, test_features, train_labels, test_labels = train_test_split(
     features, labels, test_size=0.25, random_state=0)

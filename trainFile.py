@@ -32,7 +32,7 @@ def predictScore(matchValues):
     # ni[7] = 10-ni[2]
 
     numericals = pd.DataFrame({'matchDate': ni[0], 'runs': ni[1], 'wickets': ni[2],
-                               'strikerRuns': ni[3], 'nonStrikerRuns': ni[4], 'balls': ni[5], 'ballsRem': 300-ni[5], 'wktsRem': 10-ni[2]}, index=[0])
+                               'strikerRuns': ni[3], 'nonStrikerRuns': ni[4], 'balls': ni[5]}, index=[0])
     print(numericals)
     encoded = myEncoder.fit_transform(inp[0:3].reshape(1, -1)).toarray()
 
@@ -41,6 +41,8 @@ def predictScore(matchValues):
 
     features = pd.concat([numericals, pd.DataFrame(
         encoded, columns=feature_names).astype(int)], axis=1)
+
+    print(features)
 
     z = predModel.predict(features)
 
