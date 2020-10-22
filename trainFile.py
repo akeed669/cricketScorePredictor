@@ -1,11 +1,5 @@
 import pandas as pd
 import numpy as np
-from sklearn.metrics import mean_squared_error
-from sklearn.model_selection import cross_val_score, KFold, GridSearchCV
-from sklearn.model_selection import train_test_split
-from sklearn.ensemble import RandomForestRegressor, ExtraTreesRegressor
-from sklearn.preprocessing import StandardScaler, MinMaxScaler, OneHotEncoder
-from sklearn.compose import make_column_transformer
 from datetime import datetime
 import pickle
 
@@ -20,32 +14,31 @@ infile3.close()
 
 def predictScore(matchValues):
 
-    inp = np.array(matchValues)
-    print(inp)
-    n = inp[3:]
+    userInputs = np.array(matchValues)
+    userInputs[3] = "2017"
+    print(type(userInputs[3]))
+    numericalInputs = userInputs[4:]
 
-    n[0] = datetime.strptime(n[0], "%Y-%m-%d").toordinal()
+    numValues = numericalInputs.astype(np.integer)
+    print(numValues)
+    # numValues[6] = 300-numValues[3]
+    # numValues[7] = 10-numValues[2]
 
-    ni = n.astype(np.integer)
-    print(ni)
-    # ni[6] = 300-ni[3]
-    # ni[7] = 10-ni[2]
-
-    numericals = pd.DataFrame({'matchDate': ni[0], 'runs': ni[1], 'wickets': ni[2],
-                               'strikerRuns': ni[3], 'nonStrikerRuns': ni[4], 'balls': ni[5]}, index=[0])
+    numericals = pd.DataFrame({'runs': numValues[0], 'wickets': numValues[1],
+                               'strikerRuns': numValues[2], 'nonStrikerRuns': numValues[3], 'balls': numValues[4]}, index=[0])
     print(numericals)
-    encoded = myEncoder.fit_transform(inp[0:3].reshape(1, -1)).toarray()
+    encoded = myEncoder.fit_transform(userInputs[0:4].reshape(1, -1)).toarray()
 
     feature_names = myEncoder.get_feature_names(
-        ['venue', 'bat_team', 'bowl_team', ])
+        ['venue', 'bat_team', 'bowl_team', 'date'])
 
     features = pd.concat([numericals, pd.DataFrame(
         encoded, columns=feature_names).astype(int)], axis=1)
 
     print(features)
 
-    z = predModel.predict(features)
+    predScore = predModel.predict(features)
 
-    print("Prediction score:", z)
+    print("Prediction score:", predScore)
 
-    return z
+    return predScore

@@ -1,51 +1,51 @@
 import pandas as pd
 import numpy as np
 import pickle
-#import matplotlib.pyplot as plt
-from sklearn.metrics import mean_squared_error
-from sklearn.model_selection import cross_val_score, KFold, GridSearchCV
 from sklearn.model_selection import train_test_split
-from sklearn.ensemble import RandomForestRegressor, ExtraTreesRegressor
-from sklearn.preprocessing import StandardScaler, MinMaxScaler, OneHotEncoder
-from sklearn.compose import make_column_transformer
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.preprocessing import OneHotEncoder
 from datetime import datetime
 
 
 # retrieve the dataset from the csv file
-allColumns = pd.read_csv('odiBallsReducedAdded.csv')
+allColumns = pd.read_csv('odiBallsReduced.csv')
 
-myColumns = allColumns.iloc[:50000]
+#myColumns = allColumns.iloc[:50000]
 
 # drop any unneccesary columns
 myColumns = allColumns.drop(
-    ['mid', 'ballsRem', 'wktsRem'], axis=1)
-
-# convert the date input to a pandas datetime object
-myColumns['date'] = pd.to_datetime(myColumns['date'])
-
-# convert all the dates in the date column to type ordinal
-myColumns['date'] = myColumns['date'].apply(datetime.toordinal)
+    ['mid', 'runs_last_5', 'wickets_last_5', 'batsman', 'bowler'], axis=1)
 
 
 # specify what the model will predict
-labels = np.array(myColumns['total'])
+labels = myColumns['total']
 
 # specify the features that the model will use as inputs
 allFeatures = myColumns.drop('total', axis=1)
-# print(allFeatures.tail())
+
+# convert the string dates to datetime objects
+allFeatures['date'] = pd.to_datetime(allFeatures['date'])
+# extract the year from each date
+allFeatures['date'] = allFeatures['date'].dt.year
+
+
 # select all columns where the data type = object
 forEncoding = allFeatures.select_dtypes('object')
+# date also needs to be encoded
+forEncoding.insert(3, 'date', allFeatures['date'])
 
-chi = forEncoding.values
+catArray = forEncoding.values
 
-venues = np.unique(chi[:, 0])
+venues = np.unique(catArray[:, 0])
 exportVenues = venues.tolist()
 
-bat_team = np.unique(chi[:, 1])
+bat_team = np.unique(catArray[:, 1])
 exportBatTeams = bat_team.tolist()
 
-bowl_team = np.unique(chi[:, 2])
+bowl_team = np.unique(catArray[:, 2])
 exportBowlTeams = bowl_team.tolist()
+
+date = np.unique(catArray[:, 3])
 
 listsArray = [exportVenues, exportBatTeams, exportBowlTeams]
 
@@ -58,9 +58,9 @@ outfile1.close()
 
 # encode all the categorical columns
 encoder = OneHotEncoder(
-    categories=[venues, bat_team, bowl_team], handle_unknown="ignore")
+    categories=[venues, bat_team, bowl_team, date], handle_unknown="ignore")
 
-encoded = encoder.fit_transform(chi).toarray()
+encoded = encoder.fit_transform(catArray).toarray()
 
 # storing/pickling the encoder into a file
 filename3 = 'encoder'
@@ -68,16 +68,18 @@ outfile3 = open(filename3, 'wb')
 pickle.dump(encoder, outfile3)
 outfile3.close()
 
-feature_names = encoder.get_feature_names(['venue', 'bat_team', 'bowl_team'])
+feature_names = encoder.get_feature_names(
+    ['venue', 'bat_team', 'bowl_team', 'date'])
 
-features = pd.concat([allFeatures.select_dtypes(exclude='object'), pd.DataFrame(
+features = pd.concat([allFeatures.select_dtypes(exclude='object').drop(columns='date'), pd.DataFrame(
     encoded, columns=feature_names).astype(int)], axis=1)
 
 
 train_features, test_features, train_labels, test_labels = train_test_split(
     features, labels, test_size=0.25, random_state=0)
 
-rf = RandomForestRegressor(n_estimators=100, random_state=42)
+rf = RandomForestRegressor(n_estimators=800, random_state=42, min_samples_split=5,
+                           min_samples_leaf=1, max_features='sqrt', max_depth=90, bootstrap=False)
 rf.fit(train_features, train_labels)
 
 # storing/pickling the fitted model into a file

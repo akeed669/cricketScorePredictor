@@ -4,7 +4,7 @@ from flask_cors import CORS
 from trainFile import predictScore
 import json
 import pickle
-# from joblib import dump, load
+
 
 app = Flask(__name__)
 CORS(app)
@@ -18,7 +18,6 @@ infile1.close()
 def sendListData():
     response = jsonify({"venues": lists[0],
                         "bowlTeams": lists[2], "batTeams": lists[1]})
-    # response.headers.add('Access-Control-Allow-Origin', '*')
     return response
 
 
@@ -29,13 +28,6 @@ def predict():
     calculatedScore = predictScore(mydict)
     return jsonify(round(calculatedScore[0]))
 
-
-# @app.route('/results', methods=['POST'])
-# def results():
-#     data = request.get_json(force=True)
-#     prediction = model.predict([np.array(list(data.values()))])
-#     output = prediction[0]
-#     return jsonify(output)
 
 if __name__ == "__main__":
 
