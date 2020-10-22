@@ -10,14 +10,15 @@ class PredictForm extends Form {
       venue: "",
       batTeam: "",
       bowlTeam: "",
-      matchDate: "",
+      matchYear: "",
       runs: 0,
-      wickets: 0,
-      balls: 0,
+      wickets: 0,      
       strikerRuns: 0,
       nonStrikerRuns: 0,
+      balls: 0,
     },
     venues: [],
+    matchYears:[],
     bowlTeams: [],
     batTeams: [],
     prediction: 0,
@@ -31,66 +32,42 @@ class PredictForm extends Form {
 
     bowlTeam: Joi.string().required().label("Bowling team"),
 
-    matchDate: Joi.date().required().label("Date of Match"),
+    matchYear: Joi.number().required().label("Year of Match"),
 
     runs: Joi.number().required().min(0).max(350).label("Runs scored"),
 
-    wickets: Joi.number().required().min(0).max(10).label("Wickets fallen"),
-
-    balls: Joi.number().required().min(0).max(300).label("Balls bowled"),
+    wickets: Joi.number().required().min(0).max(10).label("Wickets fallen"),    
 
     strikerRuns: Joi.number()
       .required()
       .min(0)
-      .max(200)
-      .less(Joi.ref("runs"))
+      .max(200)     
       .label("Runs scored by striker"),
 
     nonStrikerRuns: Joi.number()
       .required()
       .min(0)
-      .max(200)
-      .less(Joi.ref("runs"))
+      .max(200)     
       .label("Runs scored by non-striker"),
+
+    balls: Joi.number().required().min(0).max(300).label("Balls bowled"),
   };
 
-  async populateVenues() {
+  async populateLists() {
     const { data: names } = await getSelectValues();
 
     this.setState({
+      matchYears:names.matchYears,
       venues: names.venues,
       bowlTeams: names.bowlTeams,
       batTeams: names.batTeams,
     });
   }
 
-  // async populateMovie() {
-  //   try {
-  //     const movieId = this.props.match.params.id;
-  //     if (movieId === "new") return;
-
-  //     const { data: movie } = await getMovie(movieId);
-  //     this.setState({ data: this.mapToViewModel(movie) });
-  //   } catch (ex) {
-  //     if (ex.response && ex.response.status === 404)
-  //       this.props.history.replace("/not-found");
-  //   }
-  // }
-
   async componentDidMount() {
-    await this.populateVenues();
+    await this.populateLists();
     //await this.populateMovie();
   }
-
-  // mapToViewModel(movie) {
-  //   return {
-  //     _id: movie._id,
-  //     title: movie.title,
-  //     genreId: movie.genre._id,
-  //     numberInStock: movie.numberInStock,
-  //     dailyRentalRate: movie.dailyRentalRate,
-  //   };
-  // }
 
   doSubmit = async () => {
     const { data: prediction } = await predictScore(this.state.data);
@@ -108,7 +85,7 @@ class PredictForm extends Form {
         <div className="row justify-content-center align-items-center h-100 mt-5 mb-5">
           <div className="col col-xl-5">
             <form onSubmit={this.handleSubmit}>
-              {this.renderInput("matchDate", "Match Date", "date")}
+              {this.renderSelect("matchYear", "Match Year", this.state.matchYears)}
               {this.renderSelect("venue", "Match Venue", this.state.venues)}
               {this.renderSelect(
                 "batTeam",
@@ -120,11 +97,11 @@ class PredictForm extends Form {
                 "Bowling Team",
                 this.state.bowlTeams
               )}
-              {this.renderInput("runs", "Runs")}
-              {this.renderInput("balls", "Balls")}
+              {this.renderInput("runs", "Runs")}              
               {this.renderInput("wickets", "Wickets")}
               {this.renderInput("strikerRuns", "Striker Runs")}
               {this.renderInput("nonStrikerRuns", "Non Striker Runs")}
+              {this.renderInput("balls", "Balls")}
               <div className="row justify-content-center mt-4 mb-4">
                 {this.renderButton("PREDICT SCORE!")}
               </div>
