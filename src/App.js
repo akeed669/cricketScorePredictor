@@ -2,10 +2,7 @@ import React, { Component } from "react";
 import { Route, Redirect, Switch } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 
-import Movies from "./components/movies";
 import PredictForm from "./components/predictForm";
-import Customers from "./components/customers";
-import Rentals from "./components/rentals";
 import NotFound from "./components/notFound";
 import NavBar from "./components/navBar";
 
@@ -22,12 +19,9 @@ class App extends Component {
         <NavBar />
         <main className="container">
           <Switch>
-            <Route path="/movies/:id" component={PredictForm} />
-            <Route path="/movies" render={(props) => <Movies {...props} />} />
-            <Route path="/customers" component={Customers} />
-            <Route path="/rentals" component={Rentals} />
+            <Route path="/predict/new" component={PredictForm} />            
             <Route path="/not-found" component={NotFound} />
-            <Redirect from="/" exact to="/movies" />
+            <Redirect from="/" exact to="/predict/new" />
             <Redirect to="/not-found" />
           </Switch>
         </main>

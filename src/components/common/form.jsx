@@ -7,7 +7,7 @@ class Form extends Component {
   state = {
     data: {},
     errors: {},
-  };
+  };  
 
   validate = () => {
     const options = { abortEarly: false };
@@ -35,6 +35,14 @@ class Form extends Component {
     if (errors) return;
 
     this.doSubmit();
+  };
+
+   handleAlternate = async (e) => {
+    
+    e.preventDefault();        
+    this.setState(() => this.initialState) 
+    await this.populateLists(); 
+    
   };
 
   handleChange = ({ currentTarget: input }) => {

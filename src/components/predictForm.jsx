@@ -5,7 +5,7 @@ import Form from "./common/form";
 import { getSelectValues, predictScore } from "../services/selectService";
 
 class PredictForm extends Form {
-  state = {
+  initialState = {
     data: {
       venue: "",
       batTeam: "",
@@ -17,13 +17,14 @@ class PredictForm extends Form {
       nonStrikerRuns: 0,
       balls: 0,
     },
-    venues: [],
-    matchYears:[],
+    venues: [],    
     bowlTeams: [],
     batTeams: [],
     prediction: 0,
     errors: {},
   };
+
+  state=this.initialState;
 
   schema = {
     venue: Joi.string().required().label("Match venue"),
@@ -56,8 +57,7 @@ class PredictForm extends Form {
   async populateLists() {
     const { data: names } = await getSelectValues();
 
-    this.setState({
-      matchYears:names.matchYears,
+    this.setState({     
       venues: names.venues,
       bowlTeams: names.bowlTeams,
       batTeams: names.batTeams,
@@ -65,8 +65,7 @@ class PredictForm extends Form {
   }
 
   async componentDidMount() {
-    await this.populateLists();
-    //await this.populateMovie();
+    await this.populateLists();    
   }
 
   doSubmit = async () => {
@@ -85,7 +84,7 @@ class PredictForm extends Form {
         <div className="row justify-content-center align-items-center h-100 mt-5 mb-5">
           <div className="col col-xl-5">
             <form onSubmit={this.handleSubmit}>
-              {this.renderSelect("matchYear", "Match Year", this.state.matchYears)}
+              {this.renderSelect("matchYear", "Match Year", ["2018","2019","2020"])}
               {this.renderSelect("venue", "Match Venue", this.state.venues)}
               {this.renderSelect(
                 "batTeam",
@@ -102,9 +101,17 @@ class PredictForm extends Form {
               {this.renderInput("strikerRuns", "Striker Runs")}
               {this.renderInput("nonStrikerRuns", "Non Striker Runs")}
               {this.renderInput("balls", "Balls")}
-              <div className="row justify-content-center mt-4 mb-4">
-                {this.renderButton("PREDICT SCORE!")}
-              </div>
+              <div className="btn-group" role="group">
+                <button type="submit" disabled={this.validate()} className="btn btn-primary mt-3 ml-5">
+                  Predict Score!
+                </button>              
+            
+                <button onClick={this.handleAlternate} className="btn btn-primary mt-3 ml-3">
+                  Reset Form
+                </button>
+              </div>             
+               
+              
               {this.state.prediction > 0 && (
                 <div>
                   <p>The predicted score is {this.state.prediction} </p>
