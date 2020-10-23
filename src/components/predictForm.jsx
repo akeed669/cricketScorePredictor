@@ -2,7 +2,9 @@
 import React from "react";
 import Joi from "joi-browser";
 import Form from "./common/form";
+import ResultsTable from './resultsTable';
 import { getSelectValues, predictScore } from "../services/selectService";
+
 
 class PredictForm extends Form {
   initialState = {
@@ -21,6 +23,7 @@ class PredictForm extends Form {
     bowlTeams: [],
     batTeams: [],
     prediction: 0,
+    predictions:[],
     errors: {},
   };
 
@@ -70,17 +73,20 @@ class PredictForm extends Form {
 
   doSubmit = async () => {
     const { data: prediction } = await predictScore(this.state.data);    
-    this.setState({ prediction });    
+    this.setState({ prediction, predictions:[...this.state.predictions,prediction] });    
   };
 
   render() {
     return (
-      <div className="container-fluid h-100 bg-light text-dark">
+      <div className="container-fluid h-100 text-dark">
         <div className="row justify-content-center">
           <h1 className="display-3">Prediction Form</h1>
         </div>
         <div className="row justify-content-center align-items-center h-100 mt-5 mb-5">
-          <div className="col col-xl-5">
+          <div className="col col-xl-2 mr-4 bg-light">
+            <ResultsTable prediction={this.state.predictions}></ResultsTable>
+          </div>
+          <div className="col">
             <form onSubmit={this.handleSubmit}>
               {this.renderSelect("matchYear", "Match Year", ["2018","2019","2020"])}
               {this.renderSelect("venue", "Match Venue", this.state.venues)}
