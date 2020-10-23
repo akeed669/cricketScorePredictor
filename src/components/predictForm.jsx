@@ -1,7 +1,7 @@
+
 import React from "react";
 import Joi from "joi-browser";
 import Form from "./common/form";
-//import { getMovie, saveMovie } from "../services/movieService";
 import { getSelectValues, predictScore } from "../services/selectService";
 
 class PredictForm extends Form {
@@ -69,10 +69,8 @@ class PredictForm extends Form {
   }
 
   doSubmit = async () => {
-    const { data: prediction } = await predictScore(this.state.data);
-    console.log(typeof prediction);
-    this.setState({ prediction });
-    //this.props.history.push("/movies");
+    const { data: prediction } = await predictScore(this.state.data);    
+    this.setState({ prediction });    
   };
 
   render() {
@@ -109,7 +107,7 @@ class PredictForm extends Form {
                 <button onClick={this.handleAlternate} className="btn btn-primary mt-3 ml-3">
                   Reset Form
                 </button>
-              </div>             
+              </div>           
                
               
               {this.state.prediction > 0 && (

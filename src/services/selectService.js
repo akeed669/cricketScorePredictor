@@ -8,3 +8,6 @@ export function getSelectValues() {
 export function predictScore(match) {
   return http.post(apiUrl + "/predict", match);
 }
+
+
+
