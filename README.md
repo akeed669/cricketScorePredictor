@@ -1,17 +1,13 @@
-# Parcel Delivery System
+# Cricket Score Predictor
 
-## An integrated application developed using React, React Native and Spring Boot
+## A machine learning project for predicting the first innings score of an ODI match 
 
 ### Setting up the projects
 
-Install node modules for all three projects by executing following commands on the command line:
+Install node modules for the React project on the command line:
 
 ```sh
 $ cd frontEnd
-$ npm install
-$ cd ./backEnd
-$ npm install
-$ cd ./mobileApp
 $ npm install
 ```
 
@@ -24,14 +20,12 @@ $ cd frontEnd
 $ npm start
 ```
 
-### Start the React Native mobile application
+### Start the Flask server
 
 ```sh
-$ cd mobileApp
-$ npm start
+$ cd backEnd
+$ python app.py
 ```
-
-### Run the back end server using an IDE of your choice
 
 ### Developed by Akeed Manuideen
 
