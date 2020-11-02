@@ -14,15 +14,16 @@ class PredictForm extends Form {
       bowlTeam: "",
       matchYear: "",
       runs: 0,
-      wickets: 0,      
+      wickets: 0,
       strikerRuns: 0,
       nonStrikerRuns: 0,
       balls: 0,
     },
-    venues: [],    
+    venues: [],
     bowlTeams: [],
     batTeams: [],
     prediction: 0,
+    ballsPred:0,
     predictions:[],
     errors: {},
   };
@@ -40,18 +41,18 @@ class PredictForm extends Form {
 
     runs: Joi.number().required().min(0).max(350).label("Runs scored"),
 
-    wickets: Joi.number().required().min(0).max(10).label("Wickets fallen"),    
+    wickets: Joi.number().required().min(0).max(10).label("Wickets fallen"),
 
     strikerRuns: Joi.number()
       .required()
       .min(0)
-      .max(200)     
+      .max(200)
       .label("Runs scored by striker"),
 
     nonStrikerRuns: Joi.number()
       .required()
       .min(0)
-      .max(200)     
+      .max(200)
       .label("Runs scored by non-striker"),
 
     balls: Joi.number().required().min(0).max(300).label("Balls bowled"),
@@ -60,7 +61,7 @@ class PredictForm extends Form {
   async populateLists() {
     const { data: names } = await getSelectValues();
 
-    this.setState({     
+    this.setState({
       venues: names.venues,
       bowlTeams: names.bowlTeams,
       batTeams: names.batTeams,
@@ -68,60 +69,94 @@ class PredictForm extends Form {
   }
 
   async componentDidMount() {
-    await this.populateLists();    
+    await this.populateLists();
   }
 
   doSubmit = async () => {
-    const { data: prediction } = await predictScore(this.state.data);    
-    this.setState({ prediction, predictions:[...this.state.predictions,prediction] });    
+    const { data: prediction } = await predictScore(this.state.data);
+    const deliveries = this.state.data.balls
+    this.setState({ ballsPred:deliveries, prediction, predictions:[...this.state.predictions,{prediction:prediction, deliveries:deliveries}] });
   };
 
   render() {
     return (
-      <div className="container-fluid h-100 text-dark">
-        <div className="row justify-content-center">
-          <h1 className="display-3">Prediction Form</h1>
-        </div>
-        <div className="row justify-content-center align-items-center h-100 mt-5 mb-5">
-          <div className="col col-xl-2 mr-4 bg-light">
-            <ResultsTable prediction={this.state.predictions}></ResultsTable>
-          </div>
+
+      <div className="container-fluid">
+
+        <div className="row navbar navbar-expand-lg navbar-light bg-light">
+
+
+          <h2 className="col navbar-brand">
+            Cricket Score Predictor
+          </h2>
+
+
+          {this.state.prediction > 0 && (
+            <h2 className="col navbar-brand text-primary">
+              The predicted score after {this.state.ballsPred} balls is {this.state.prediction}
+            </h2>
+          )}
+
+          {this.state.prediction == 0 &&(<h2 className="col navbar-brand">Prediction Form</h2>)}
+
           <div className="col">
-            <form onSubmit={this.handleSubmit}>
-              {this.renderSelect("matchYear", "Match Year", ["2018","2019","2020"])}
-              {this.renderSelect("venue", "Match Venue", this.state.venues)}
-              {this.renderSelect(
-                "batTeam",
-                "Batting Team",
-                this.state.batTeams
-              )}
-              {this.renderSelect(
-                "bowlTeam",
-                "Bowling Team",
-                this.state.bowlTeams
-              )}
-              {this.renderInput("runs", "Runs")}              
-              {this.renderInput("wickets", "Wickets")}
-              {this.renderInput("strikerRuns", "Striker Runs")}
-              {this.renderInput("nonStrikerRuns", "Non Striker Runs")}
-              {this.renderInput("balls", "Balls")}
-              <div className="btn-group" role="group">
-                <button type="submit" disabled={this.validate()} className="btn btn-primary mt-3 ml-5">
-                  Predict Score!
-                </button>              
-            
-                <button onClick={this.handleAlternate} className="btn btn-primary mt-3 ml-3">
-                  Reset Form
-                </button>
-              </div>           
-               
-              
+            <button onClick={this.handleAlternate} className="btn btn-primary pull-right">
+              Reset Form
+            </button>
+          </div>
+
+
+        </div>
+
+        <div className="container h-100 text-dark">
+
+          <div className="row h-100 mb-5">
+
+            <div className="col-3 mr-5">
+
               {this.state.prediction > 0 && (
-                <div>
-                  <p>The predicted score is {this.state.prediction} </p>
-                </div>
+              <div className="border h2 text-center mb-4 text-primary bg-light">
+                <p> {this.state.data.batTeam} </p>
+                <p> VS </p>
+                <p> {this.state.data.bowlTeam} </p>
+              </div>
               )}
-            </form>
+
+              <div>
+                <ResultsTable prediction={this.state.predictions}></ResultsTable>
+              </div>
+
+            </div>
+
+            <div className="col-7">
+
+              <form onSubmit={this.handleSubmit}>
+                {this.renderSelect("matchYear", "Match Year", ["2018","2019","2020"])}
+                {this.renderSelect("venue", "Match Venue", this.state.venues)}
+                {this.renderSelect(
+                  "batTeam",
+                  "Batting Team",
+                  this.state.batTeams
+                )}
+                {this.renderSelect(
+                  "bowlTeam",
+                  "Bowling Team",
+                  this.state.bowlTeams
+                )}
+                {this.renderInput("runs", "Runs")}
+                {this.renderInput("wickets", "Wickets")}
+                {this.renderInput("strikerRuns", "Striker Runs")}
+                {this.renderInput("nonStrikerRuns", "Non Striker Runs")}
+                {this.renderInput("balls", "Balls")}
+
+                <div className="row justify-content-center">
+                  <button type="submit" disabled={this.validate()} className="btn btn-primary mt-3">
+                    Predict Score!
+                  </button>
+                </div>
+
+              </form>
+            </div>
           </div>
         </div>
       </div>

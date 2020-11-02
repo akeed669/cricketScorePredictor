@@ -16,10 +16,9 @@ class App extends Component {
     return (
       <React.Fragment>
         <ToastContainer />
-        <NavBar />
-        <main className="container">
+        <main className="container-fluid px-0 m-0">
           <Switch>
-            <Route path="/predict/new" component={PredictForm} />            
+            <Route path="/predict/new" component={PredictForm} />
             <Route path="/not-found" component={NotFound} />
             <Redirect from="/" exact to="/predict/new" />
             <Redirect to="/not-found" />
