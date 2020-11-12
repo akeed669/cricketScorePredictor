@@ -1,6 +1,6 @@
 # Vidly-React
 
-Front end for the vidly-api-node project build using react.
+Front end for the cricket score predictor using React.
 
 ## Acknowledgments
 
